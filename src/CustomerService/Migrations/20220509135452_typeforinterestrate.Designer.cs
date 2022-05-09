@@ -4,14 +4,16 @@ using CustomerService.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CustomerService.Migrations
 {
     [DbContext(typeof(BankMgmtDBContext))]
-    partial class BankMgmtDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220509135452_typeforinterestrate")]
+    partial class typeforinterestrate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,14 +100,14 @@ namespace CustomerService.Migrations
                     b.Property<decimal>("LoanAmount")
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<int>("LoanDuration")
-                        .HasColumnType("int");
-
                     b.Property<string>("LoanType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedDtate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("loanDuration")
+                        .HasColumnType("int");
 
                     b.HasKey("LoanId");
 

@@ -28,12 +28,13 @@ namespace CustomerService
             _configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<BankMgmtDBContext>(dbContext => dbContext.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<BankMgmtDBContext>(dbContext => dbContext.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             var appSettingsSection = _configuration.GetSection("AppSettings");

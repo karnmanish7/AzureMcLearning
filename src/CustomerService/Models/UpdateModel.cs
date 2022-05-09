@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CustomerService.Entities
+namespace CustomerService.Models
 {
-    public class Customer
+    public class UpdateModel
     {
-        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
+        public string Password { get; set; }
         public string Address { get; set; }
         public string State { get; set; }
         public int Pincode { get; set; }
@@ -21,17 +19,9 @@ namespace CustomerService.Entities
         public string Email { get; set; }
         public int ContactNo { get; set; }
         public DateTime DOB { get; set; }
-        public AccountType AccountType { get; set; }
+       
         public DateTime CreatedDtate { get; set; }
         public DateTime UpdatedDtate { get; set; }
-        public virtual List<Loan> Loans { get; set; }
-    }
-    public enum AccountType
-    {
-        Savings,
-        Current,
-        Corporate,
-        Goverment
+
     }
 }
-

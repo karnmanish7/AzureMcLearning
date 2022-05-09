@@ -13,6 +13,7 @@ namespace CustomerService.Helpers
         public AutoMapperProfile()
         {
             CreateMap<RegisterModel, Customer>();
+            CreateMap<UpdateModel, Customer>();
         }
         
     }

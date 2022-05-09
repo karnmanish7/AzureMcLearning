@@ -4,14 +4,16 @@ using CustomerService.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CustomerService.Migrations
 {
     [DbContext(typeof(BankMgmtDBContext))]
-    partial class BankMgmtDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220509135611_typeforinterestrate1")]
+    partial class typeforinterestrate1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

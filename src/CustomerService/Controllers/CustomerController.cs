@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 
 namespace CustomerService.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CustomerController : ControllerBase
@@ -93,6 +94,44 @@ namespace CustomerService.Controllers
             var user = await _customerRepository.GetById(id);
             var model = _mapper.Map<RegisterModel>(user);
             return Ok(model);
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateModel model)
+        {
+            // map model to entity and set id
+            var user = _mapper.Map<Customer>(model);
+            user.Id = id;
+
+            try
+            {
+                // update user 
+               await  _customerRepository.Update(user, model.Password);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpPost]
+        [Route("loan")]
+        public Task<IActionResult> ApplyLoan([FromBody] LoanModel model)
+        {
+            // map model to entity
+            var loan = _mapper.Map<Loan>(model);
+
+            try
+            {
+                // create user
+                await _customerRepository.applyLoan(loan, model.LoanAmount);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

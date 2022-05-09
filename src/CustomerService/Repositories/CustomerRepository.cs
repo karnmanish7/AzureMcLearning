@@ -13,12 +13,12 @@ namespace CustomerService.Repositories
     public class CustomerRepository: ICustomerRepository
     {
         private BankMgmtDBContext _bankMgmtDBContext;
-        private ICustomerRepository _customerRepository;
+      
 
-        public CustomerRepository(BankMgmtDBContext bankMgmtDBContext,ICustomerRepository customerRepository)
+        public CustomerRepository(BankMgmtDBContext bankMgmtDBContext)
         {
             _bankMgmtDBContext = bankMgmtDBContext;
-            _customerRepository = customerRepository;
+       
         }
 
         public async Task<Customer> Authenticate(string username, string password)
@@ -56,8 +56,8 @@ namespace CustomerService.Repositories
             Customer.PasswordHash = passwordHash;
             Customer.PasswordSalt = passwordSalt;
 
-            _bankMgmtDBContext.Customers.Add(Customer);
-            _bankMgmtDBContext.SaveChanges();
+            await _bankMgmtDBContext.Customers.AddAsync(Customer);
+            await _bankMgmtDBContext.SaveChangesAsync();
 
             return Customer;
         }
@@ -91,5 +91,56 @@ namespace CustomerService.Repositories
         {
             return await _bankMgmtDBContext.Customers.FindAsync(id);
         }
+
+        public async Task Update(Customer userParam, string password = null)
+        {
+            var user = await _bankMgmtDBContext.Customers.FindAsync(userParam.Id);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            // update username if it has changed
+            if (!string.IsNullOrWhiteSpace(userParam.Username) && userParam.Username != user.Username)
+            {
+                // throw error if the new username is already taken
+                if (await _bankMgmtDBContext.Customers.AnyAsync(x => x.Username == userParam.Username))
+                    throw new Exception("Username " + userParam.Username + " is already taken");
+
+                user.Username = userParam.Username;
+            }
+
+            // update user properties if provided
+            if (!string.IsNullOrWhiteSpace(userParam.FirstName))
+                user.FirstName = userParam.FirstName;
+
+            if (!string.IsNullOrWhiteSpace(userParam.LastName))
+                user.LastName = userParam.LastName;
+            if (!string.IsNullOrWhiteSpace(userParam.Address))
+                user.Address = userParam.Address;
+            if (userParam.ContactNo !=null || userParam.ContactNo !=0 )
+                user.ContactNo = userParam.ContactNo;
+
+            // update password if provided
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                byte[] passwordHash, passwordSalt;
+                CreatePasswordHash(password, out passwordHash, out passwordSalt);
+
+                user.PasswordHash = passwordHash;
+                user.PasswordSalt = passwordSalt;
+            }
+
+             _bankMgmtDBContext.Customers.Update(user);
+            await _bankMgmtDBContext.SaveChangesAsync();
+        }
+
+        public async Task<Loan> ApplyLoan(Loan loan)
+        {
+            await _bankMgmtDBContext.Loans.AddAsync(loan);
+            await _bankMgmtDBContext.SaveChangesAsync();
+
+            return loan;
+        }
+
     }
 }

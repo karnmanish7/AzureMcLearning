@@ -12,6 +12,9 @@ namespace CustomerService.Repositories
         Task<Customer> CreateCustomer(Customer user, string password);
         Task<Customer> Authenticate(string username, string password);
         Task<Customer> GetById(int id);
+        Task Update(Customer user, string password = null);
+        Task<Loan> ApplyLoan(Loan loan);
+        
 
     }
 }
