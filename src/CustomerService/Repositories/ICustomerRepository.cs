@@ -14,7 +14,8 @@ namespace CustomerService.Repositories
         Task<Customer> GetById(int id);
         Task Update(Customer user, string password = null);
         Task<Loan> ApplyLoan(Loan loan);
-        
+        Task<IEnumerable<Loan>> ViewLoanByCustomerId(int customerId);
+
 
     }
 }

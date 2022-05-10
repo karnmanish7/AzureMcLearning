@@ -14,6 +14,7 @@ namespace CustomerService.Helpers
         {
             CreateMap<RegisterModel, Customer>();
             CreateMap<UpdateModel, Customer>();
+            CreateMap<LoanModel, Loan>();
         }
         
     }

@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace CustomerService.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CustomerController : ControllerBase
@@ -69,6 +69,7 @@ namespace CustomerService.Controllers
             });
         }
 
+        [AllowAnonymous]
         [Route("register")]
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
@@ -115,8 +116,8 @@ namespace CustomerService.Controllers
             }
         }
         [HttpPost]
-        [Route("loan")]
-        public Task<IActionResult> ApplyLoan([FromBody] LoanModel model)
+        [Route("applyLoan")]
+        public async Task<IActionResult> ApplyLoan([FromBody] LoanModel model)
         {
             // map model to entity
             var loan = _mapper.Map<Loan>(model);
@@ -124,7 +125,7 @@ namespace CustomerService.Controllers
             try
             {
                 // create user
-                await _customerRepository.applyLoan(loan, model.LoanAmount);
+                await _customerRepository.ApplyLoan(loan);
                 return Ok();
             }
             catch (Exception ex)
@@ -132,6 +133,23 @@ namespace CustomerService.Controllers
                 // return error message if there was an exception
                 return BadRequest(new { message = ex.Message });
             }
+        }
+        [HttpGet]
+        [Route("applyLoan/{customerId}")]
+        
+        public async Task<IEnumerable<Loan>> ViewLoanByCustomerId(int id)
+        {
+            var loan = await _customerRepository.ViewLoanByCustomerId(id);
+            IList<Loan> model = _mapper.Map<IList<Loan>>(loan);
+            return model;
+
+        }
+        [HttpGet("{customerId}/{loanId}")]
+        public async Task<IActionResult> ViewLoanWithCustAndLoanId(int id)
+        {
+            var user = await _customerRepository.GetById(id);
+            var model = _mapper.Map<RegisterModel>(user);
+            return Ok(model);
         }
     }
 }

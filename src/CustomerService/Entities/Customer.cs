@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,7 +8,9 @@ namespace CustomerService.Entities
 {
     public class Customer
     {
-        public int Id { get; set; }
+        [Key]
+        
+        public int CustomerId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }
@@ -24,7 +27,7 @@ namespace CustomerService.Entities
         public AccountType AccountType { get; set; }
         public DateTime CreatedDtate { get; set; }
         public DateTime UpdatedDtate { get; set; }
-        public virtual List<Loan> Loans { get; set; }
+        //public virtual List<Loan> Loans { get; set; }
     }
     public enum AccountType
     {

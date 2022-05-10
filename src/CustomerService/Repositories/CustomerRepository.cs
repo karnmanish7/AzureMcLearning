@@ -26,7 +26,7 @@ namespace CustomerService.Repositories
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = _bankMgmtDBContext.Customers.SingleOrDefault(x => x.Username == username);
+            var user = await _bankMgmtDBContext.Customers.SingleOrDefaultAsync(x => x.Username == username);
 
             // check if username exists
             if (user == null)
@@ -117,7 +117,7 @@ namespace CustomerService.Repositories
                 user.LastName = userParam.LastName;
             if (!string.IsNullOrWhiteSpace(userParam.Address))
                 user.Address = userParam.Address;
-            if (userParam.ContactNo !=null || userParam.ContactNo !=0 )
+            if (userParam.ContactNo !=0 )
                 user.ContactNo = userParam.ContactNo;
 
             // update password if provided
@@ -136,10 +136,23 @@ namespace CustomerService.Repositories
 
         public async Task<Loan> ApplyLoan(Loan loan)
         {
-            await _bankMgmtDBContext.Loans.AddAsync(loan);
-            await _bankMgmtDBContext.SaveChangesAsync();
+            try
+            {
+                await _bankMgmtDBContext.Loans.AddAsync(loan);
+                await _bankMgmtDBContext.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+
+            }
+            
 
             return loan;
+        }
+        public async Task<IEnumerable<Loan>> ViewLoanByCustomerId(int customerId)
+        {
+            IList<Loan> list= await _bankMgmtDBContext.Loans.Where(c => c.CustomerId == customerId).ToListAsync();
+            return list;
         }
 
     }
