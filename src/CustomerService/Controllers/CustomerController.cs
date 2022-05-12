@@ -50,7 +50,7 @@ namespace CustomerService.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                    new Claim(ClaimTypes.Name, user.CustomerId.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -61,7 +61,7 @@ namespace CustomerService.Controllers
             // return basic user info and authentication token
             return Ok(new
             {
-                Id = user.Id,
+                Id = user.CustomerId,
                 Username = user.Username,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
@@ -101,7 +101,7 @@ namespace CustomerService.Controllers
         {
             // map model to entity and set id
             var user = _mapper.Map<Customer>(model);
-            user.Id = id;
+            user.CustomerId = id;
 
             try
             {

@@ -94,7 +94,7 @@ namespace CustomerService.Repositories
 
         public async Task Update(Customer userParam, string password = null)
         {
-            var user = await _bankMgmtDBContext.Customers.FindAsync(userParam.Id);
+            var user = await _bankMgmtDBContext.Customers.FindAsync(userParam.CustomerId);
 
             if (user == null)
                 throw new Exception("User not found");
