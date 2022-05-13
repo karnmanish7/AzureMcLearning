@@ -25,8 +25,8 @@ namespace CustomerService.Entities
         public int ContactNo { get; set; }
         public DateTime DOB { get; set; }
         public AccountType AccountType { get; set; }
-        public DateTime CreatedDtate { get; set; }
-        public DateTime UpdatedDtate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
         //public virtual List<Loan> Loans { get; set; }
     }
     public enum AccountType

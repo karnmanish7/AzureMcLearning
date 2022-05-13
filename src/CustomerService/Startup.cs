@@ -1,4 +1,5 @@
 using CustomerService.DBContext;
+using CustomerService.Extensions;
 using CustomerService.Helpers;
 using CustomerService.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -95,6 +96,9 @@ namespace CustomerService
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CustomerService v1"));
             }
+
+            //app.ConfigureExceptionHandler(logger);
+            app.ConfigureCustomExceptionMiddleware();
 
             app.UseRouting();
 

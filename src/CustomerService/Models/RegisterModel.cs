@@ -39,7 +39,7 @@ namespace CustomerService.Models
         public int ContactNo { get; set; }
         public DateTime DOB { get; set; }
 
-        public DateTime CreatedDtate { get; set; }
-        public DateTime UpdatedDtate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
     }
 }
