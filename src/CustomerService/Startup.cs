@@ -1,7 +1,9 @@
 using CustomerService.DBContext;
-using CustomerService.Extensions;
+using CustomerService.ExceptionMiddleware;
+
 using CustomerService.Helpers;
 using CustomerService.Repositories;
+using LoggerService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -79,7 +81,8 @@ namespace CustomerService
 
             // configure DI for application services
             services.AddScoped<ICustomerRepository, CustomerRepository>();
-
+            services.AddScoped<ILoggerManager, LoggerManager>();
+           
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -97,8 +100,10 @@ namespace CustomerService
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CustomerService v1"));
             }
 
+            var scope = app.ApplicationServices.CreateScope();
+            var service = scope.ServiceProvider.GetService<ILoggerManager>();
             //app.ConfigureExceptionHandler(logger);
-            app.ConfigureCustomExceptionMiddleware();
+            app.UseMiddleware<CustomExceptionMiddleware>();
 
             app.UseRouting();
 

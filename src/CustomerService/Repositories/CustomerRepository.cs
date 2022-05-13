@@ -1,5 +1,7 @@
 ﻿using CustomerService.DBContext;
 using CustomerService.Entities;
+using CustomerService.ExceptionMiddleware;
+using LoggerService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,18 +15,21 @@ namespace CustomerService.Repositories
     public class CustomerRepository: ICustomerRepository
     {
         private BankMgmtDBContext _bankMgmtDBContext;
-      
+        private ILoggerManager _logger;
 
-        public CustomerRepository(BankMgmtDBContext bankMgmtDBContext)
+        public CustomerRepository(BankMgmtDBContext bankMgmtDBContext, ILoggerManager logger)
         {
             _bankMgmtDBContext = bankMgmtDBContext;
+            _logger = logger;
        
         }
 
         public async Task<Customer> Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                return null;
+                _logger.LogError("username and password is null.");
+            return null;
+           
 
             var user = await _bankMgmtDBContext.Customers.SingleOrDefaultAsync(x => x.Username == username);
 
@@ -42,13 +47,15 @@ namespace CustomerService.Repositories
 
         public async Task<Customer> CreateCustomer(Customer Customer, string password)
         {
+            _logger.LogInfo("Registering the customer");
             // validation
             if (string.IsNullOrWhiteSpace(password))
-                throw new Exception("Password is required");
+                throw new AppException("Password is required");
+            _logger.LogError("Username already exists");
 
             if (_bankMgmtDBContext.Customers.Any(x => x.Username == Customer.Username))
-                //throw new AppException("Username \"" + user.Username + "\" is already taken");
-                throw new Exception("Username \"" + Customer.Username + "\" is already taken");
+            _logger.LogError("Username already exists");
+            throw new AppException("Username \"" + Customer.Username + "\" is already taken");
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
@@ -97,15 +104,16 @@ namespace CustomerService.Repositories
             var user = await _bankMgmtDBContext.Customers.FindAsync(userParam.CustomerId);
 
             if (user == null)
-                throw new Exception("User not found");
+                throw new AppException("User not found");
+            _logger.LogError("user not found");
 
             // update username if it has changed
             if (!string.IsNullOrWhiteSpace(userParam.Username) && userParam.Username != user.Username)
             {
                 // throw error if the new username is already taken
                 if (await _bankMgmtDBContext.Customers.AnyAsync(x => x.Username == userParam.Username))
-                    throw new Exception("Username " + userParam.Username + " is already taken");
-
+                    throw new AppException("Username " + userParam.Username + " is already taken");
+                _logger.LogError("Username " + userParam.Username + " is already taken");
                 user.Username = userParam.Username;
             }
 
@@ -136,15 +144,9 @@ namespace CustomerService.Repositories
 
         public async Task<Loan> ApplyLoan(Loan loan)
         {
-            try
-            {
+            _logger.LogInfo("Applying Losn..");
                 await _bankMgmtDBContext.Loans.AddAsync(loan);
                 await _bankMgmtDBContext.SaveChangesAsync();
-            }
-            catch(Exception ex)
-            {
-
-            }
             
 
             return loan;

@@ -4,9 +4,11 @@ using CustomerService.Entities;
 using CustomerService.Helpers;
 using CustomerService.Models;
 using CustomerService.Repositories;
+using LoggerService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
+using NLog;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -20,6 +22,7 @@ namespace CustomerService.Test
     {
         private CustomerController _customerController;
         private Mock<ICustomerRepository> _customerRepository;
+        private Mock<ILoggerManager> _logger;
 
         private IMapper _mapper;
         
@@ -45,7 +48,8 @@ namespace CustomerService.Test
         public void Setup()
         {
             _customerRepository = new Mock<ICustomerRepository>();
-            
+            _logger = new Mock<ILoggerManager>();
+
             _customer = new Customer() { FirstName = "Manish", Username = "Manish",  ContactNo = 98041234, Email = "mk@gmail.com", Address = "Bangalore", Country = "India", State = "TamilNadu", AccountType = AccountType.Corporate, DOB = Convert.ToDateTime("13-07-1994"), CreatedDate = DateTime.UtcNow, PAN = "DEZo0908" };
             _registerModel = new RegisterModel() { FirstName = "Manish", Username = "Manish", Password = "", ContactNo = 9600209, Email = "mk@gmail.com", Address = "Coimbatore", Country = "India", State = "TamilNadu",  DOB = Convert.ToDateTime("13-07-1994"), CreatedDate = DateTime.UtcNow, PAN = "DEZer456" };
             //_loan = new Loan() { CustomerId = 1, LoanType = "Personal", LoanAmount = 200000, LoanDate = DateTime.UtcNow, LoanDuration = 24, ROI = 7 };
@@ -59,7 +63,7 @@ namespace CustomerService.Test
         {
             // Arrange
             _customerRepository.Setup(x => x.CreateCustomer(_customer, _registerModel.Password));
-            var controller = new CustomerController(_customerRepository.Object,_mapper,_appSettings);
+            var controller = new CustomerController(_customerRepository.Object,_mapper,_appSettings,_logger.Object);
 
             // Act
             var actionResult = controller.Register(_registerModel);

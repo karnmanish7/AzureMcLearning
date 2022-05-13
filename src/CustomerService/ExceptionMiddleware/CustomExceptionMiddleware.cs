@@ -3,6 +3,7 @@ using LoggerService;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace CustomerService.ExceptionMiddleware
@@ -18,40 +19,38 @@ namespace CustomerService.ExceptionMiddleware
 			_next = next;
 		}
 
-		public async Task InvokeAsync(HttpContext httpContext)
+		public async Task InvokeAsync(HttpContext httpContext,ILoggerManager manager)
 		{
 			try
 			{
+				manager.LogError("test");
 				await _next(httpContext);
 			}
-			catch (AccessViolationException avEx)
+			catch (Exception error)
 			{
-				_logger.LogError($"A new violation exception has been thrown: {avEx}");
-				await HandleExceptionAsync(httpContext, avEx);
+				var response = httpContext.Response;
+				response.ContentType = "application/json";
+
+				switch (error)
+				{
+					case AppException e:
+						// custom application error
+						_logger.LogError($"A exception has been thrown: {e}");
+						response.StatusCode = (int)HttpStatusCode.BadRequest;
+						break;
+					default:
+						// unhandled error
+						_logger.LogError($"Something went wrong");
+						response.StatusCode = (int)HttpStatusCode.InternalServerError;
+						break;
+				}
+
+				var result = JsonSerializer.Serialize(new { message = error?.Message });
+				await response.WriteAsync(result);
 			}
-			catch (Exception ex)
-			{
-				_logger.LogError($"Something went wrong: {ex}");
-				await HandleExceptionAsync(httpContext, ex);
-			}
+			
 		}
 
-		private async Task HandleExceptionAsync(HttpContext context, Exception exception)
-		{
-			context.Response.ContentType = "application/json";
-			context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
-			var message = exception switch
-			{
-				AccessViolationException =>  "Access violation error from the custom middleware",
-				_ => "Internal Server Error from the custom middleware."
-			};
-
-			await context.Response.WriteAsync(new ErrorDetails()
-			{
-				StatusCode = context.Response.StatusCode,
-				Message = message
-			}.ToString());
-		}
+		
 	}
 }
